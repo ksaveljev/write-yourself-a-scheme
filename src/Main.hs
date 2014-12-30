@@ -9,6 +9,20 @@ data LispVal = Atom String
              | String String
              | Bool Bool
 
+instance Show LispVal where show = showVal
+
+showVal :: LispVal -> String
+showVal (String contents) = "\"" ++ contents ++ "\""
+showVal (Atom name) = name
+showVal (Number contents) = show contents
+showVal (Bool True) = "#t"
+showVal (Bool False) = "#f"
+showVal (List contents) = "(" ++ unwordsList contents ++ ")"
+showVal (DottedList h t) = "(" ++ unwordsList h ++ " . " ++ showVal t ++ ")"
+
+unwordsList :: [LispVal] -> String
+unwordsList = unwords . map showVal
+
 symbol :: Parser Char
 symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
 
@@ -66,7 +80,7 @@ parseQuoted = do
 readExpr :: String -> String
 readExpr input = case parse parseExpr "lisp" input of
                    Left err -> "No match: " ++ show err
-                   Right _ -> "Found value"
+                   Right val -> "Found " ++ show val
 
 main :: IO ()
 main = do
