@@ -129,7 +129,7 @@ primitives :: [(String, [LispVal] -> ThrowsError LispVal)]
 primitives = [ ("+", numericBinop (+))
              , ("-", numericBinop (-))
              , ("*", numericBinop (*))
-             , ("/", numericBinop (div))
+             , ("/", numericBinop div)
              , ("mod", numericBinop mod)
              , ("quotient", numericBinop quot)
              , ("remainder", numericBinop rem)
@@ -151,7 +151,7 @@ primitives = [ ("+", numericBinop (+))
 boolBinop :: (LispVal -> ThrowsError a) -> (a -> a -> Bool) -> [LispVal] -> ThrowsError LispVal
 boolBinop unpacker op args = if length args /= 2
                                then throwError $ NumArgs 2 args
-                               else do left <- unpacker $ args !! 0
+                               else do left <- unpacker $ head args
                                        right <- unpacker $ args !! 1
                                        return $ Bool $ left `op` right
 
@@ -177,19 +177,19 @@ unpackBool notBool = throwError $ TypeMismatch "boolean" notBool
 numericBinop :: (Integer -> Integer -> Integer) -> [LispVal] -> ThrowsError LispVal
 numericBinop _ [] = throwError $ NumArgs 2 []
 numericBinop _ singleVal@[_] = throwError $ NumArgs 2 singleVal
-numericBinop op params = mapM unpackNum params >>= return . Number . foldl1 op
+numericBinop op params = liftM (Number . foldl1 op) (mapM unpackNum params)
 
 unpackNum :: LispVal -> ThrowsError Integer
 unpackNum (Number n) = return n
 unpackNum (String n) = let parsed = reads n
                        in if null parsed
                             then throwError $ TypeMismatch "number" $ String n
-                            else return $ fst $ parsed !! 0
+                            else return $ fst $ head parsed
 unpackNum (List [n]) = unpackNum n
 unpackNum notNum = throwError $ TypeMismatch "number" notNum
 
 main :: IO ()
 main = do
     args <- getArgs
-    evaled <- return $ liftM show $ readExpr (args !! 0) >>= eval
+    let evaled = liftM show $ readExpr (head args) >>= eval
     putStrLn $ extractValue $ trapError evaled
