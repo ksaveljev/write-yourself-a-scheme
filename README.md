@@ -4,11 +4,13 @@ Write Yourself a Scheme in 48 Hours
 Going through a [tutorial](http://en.wikibooks.org/wiki/Write_Yourself_a_Scheme_in_48_Hours) to learn something new.
 
 Usage:
+
     cabal sandbox init
     cabal install --dependencies-only
     cabal build
 
 REPL mode:
+
     cabal run
     Lisp>>> (load "stdlib.scm")
     (lambda ("pred" . lst) ...)
@@ -19,4 +21,5 @@ REPL mode:
     Lisp>>> quit
 
 Interpreter mode:
+
     cabal run -- test.scm
