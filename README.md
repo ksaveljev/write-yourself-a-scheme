@@ -10,7 +10,7 @@ Going through a [tutorial](http://en.wikibooks.org/wiki/Write_Yourself_a_Scheme_
 REPL mode:
 
     cabal run
-    Lisp>>> (load "stdlib.scm")
+    Lisp>>> (load "src/stdlib.scm")
     (lambda ("pred" . lst) ...)
     Lisp>>> (map (curry + 2) '(1 2 3 4))
     (3 4 5 6)
